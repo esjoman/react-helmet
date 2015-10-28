@@ -8,6 +8,7 @@ export const TAG_NAMES = {
 
 export const TAG_PROPERTIES = {
     NAME: "name",
+    CONTENT: "content",
     CHARSET: "charset",
     HTTPEQUIV: "http-equiv",
     REL: "rel",

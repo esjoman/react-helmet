@@ -432,6 +432,76 @@ describe("Helmet", () => {
                 expect(secondTag.getAttribute("content")).to.equal("Inner duplicate description");
                 expect(secondTag.outerHTML).to.equal(`<meta name="description" content="Inner duplicate description" ${HELMET_ATTRIBUTE}="true">`);
             });
+
+            it("will accept meta tag with out-of-order attributes", () => {
+                ReactDOM.render(
+                    <div>
+                        <Helmet
+                            meta={[
+                                {"content": "Test description", "name": "description"}
+                            ]}
+                        />
+                    </div>,
+                    container
+                );
+
+                const existingTags = headElement.querySelectorAll(`meta[${HELMET_ATTRIBUTE}]`);
+                const [firstTag] = existingTags;
+
+                expect(existingTags).to.not.equal(undefined);
+
+                expect(existingTags.length).to.equal(1);
+
+                expect(existingTags)
+                    .to.have.deep.property("[0]")
+                    .that.is.an.instanceof(Element);
+                expect(firstTag).to.have.property("getAttribute");
+                expect(firstTag.getAttribute("name")).to.equal("description");
+                expect(firstTag.getAttribute("content")).to.equal("Test description");
+                expect(firstTag.outerHTML).to.equal(`<meta content="Test description" name="description" ${HELMET_ATTRIBUTE}="true">`);
+            });
+
+            it("will override same meta tag name regardless of attribute order", () => {
+                ReactDOM.render(
+                    <div>
+                        <Helmet
+                            meta={[
+                                {"content": "Out of order", "name": "description"},
+                                {"content": "Don't replace me", "name": "keywords"}
+                            ]}
+                        />
+                        <Helmet
+                            meta={[
+                                {"name": "description", "content": "In order description"}
+                            ]}
+                        />
+                    </div>,
+                    container
+                );
+
+                const existingTags = headElement.querySelectorAll(`meta[${HELMET_ATTRIBUTE}]`);
+                const [firstTag, secondTag] = existingTags;
+
+                expect(existingTags).to.not.equal(undefined);
+
+                expect(existingTags.length).to.equal(3);
+
+                expect(existingTags)
+                    .to.have.deep.property("[0]")
+                    .that.is.an.instanceof(Element);
+                expect(firstTag).to.have.property("getAttribute");
+                expect(firstTag.getAttribute("name")).to.equal("description");
+                expect(firstTag.getAttribute("content")).to.equal("Out of order");
+                expect(firstTag.outerHTML).to.equal(`<meta name="description" content="In order description" ${HELMET_ATTRIBUTE}="true">`);
+
+                expect(existingTags)
+                    .to.have.deep.property("[1]")
+                    .that.is.an.instanceof(Element);
+                expect(secondTag).to.have.property("getAttribute");
+                expect(secondTag.getAttribute("name")).to.equal("keywords");
+                expect(secondTag.getAttribute("content")).to.equal("Don't replace me");
+                expect(secondTag.outerHTML).to.equal(`<meta content="Don't replace me" name="description" ${HELMET_ATTRIBUTE}="true">`);
+            });
         });
 
         describe("link tags", () => {
