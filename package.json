@@ -79,6 +79,7 @@
     "posttest": "cat ./build/reports/coverage/text.txt",
     "pretest": "npm run clean && npm run lint && npm run compile",
     "compile": "babel src --out-dir dist",
-    "prepublish": "npm run compile"
+    "prepublish": "npm run compile",
+    "postinstall": "npm run compile"
   }
 }
